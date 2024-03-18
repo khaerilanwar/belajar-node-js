@@ -1,0 +1,40 @@
+<div class="row">
+    <div class="col-md-8">
+        <h2 class="mb-3">Daftar Kontak</h2>
+        <% if (msg.length !==0 ) { %>
+            <div class="alert alert-success" role="alert">
+                <%= msg %>
+            </div>
+            <% } %>
+                <a href="/contact/add" class="btn btn-primary mb-3">Tambah Data Contact</a>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Nama</th>
+                            <th scope="col">No HP</th>
+                            <th scope="col">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% contacts.forEach((contact, i)=> { %>
+                            <tr>
+                                <th scope="row">
+                                    <%= i+1 %>
+                                </th>
+                                <td>
+                                    <%= contact.nama %>
+                                </td>
+                                <td>
+                                    <%= contact.nohp.replace(/^(\+\d{2})(\d{3})(\d{4})(\d{3,5})$/, '$1 $2-$3-$4' ) %>
+                                </td>
+                                <td>
+                                    <a href="/contact/<%= contact.nama.toLowerCase().replace(' ', '-') %>"
+                                        class="btn btn-success badge rounded-pill">Detail</a>
+                                </td>
+                            </tr>
+                            <% }) %>
+                    </tbody>
+                </table>
+    </div>
+</div>
