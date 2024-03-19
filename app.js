@@ -1,10 +1,10 @@
 const express = require('express')
+const expressLayouts = require('express-ejs-layouts')
+const { body, validationResult, check } = require('express-validator');
+const { loadContacts, findContact, cekDuplikat, addContact, removeContact, updateContacts } = require('./utils/contact')
 const session = require('express-session')
 const cookieParser = require('cookie-parser')
 const flash = require('connect-flash')
-const expressLayouts = require('express-ejs-layouts')
-const { body, validationResult, check } = require('express-validator');
-const { loadContacts, findContact, cekDuplikat, addContact } = require('./utils/contact')
 const app = express()
 const port = 3000
 
@@ -70,21 +70,67 @@ app.post('/contact', [
 ], (req, res) => {
     const result = validationResult(req)
     if (!result.isEmpty()) {
-        res.send({ errors: result.array() })
-        // res.render('add-contact', {
-        //     layout: "layouts/main",
-        //     title: "Add Contact",
-        //     errors: result.array()
-        // })
+        res.render('add-contact', {
+            layout: "layouts/main",
+            title: "Add Contact",
+            errors: result.array()
+        })
+        // res.send({ errors: result.array() })
+    } else {
+        req.body.nohp = req.body.nohp.replace(/^0/, "+62")
+        addContact(req.body)
+        req.flash('msg', 'Data berhasil ditambahkan!')
+        res.redirect('/contact')
     }
-    const contact = {
-        nama: req.body.nama,
-        email: req.body.email,
-        nohp: req.body.nohp.replace(/^0/, "+62"),
+})
+
+app.get('/contact/delete/:nama', (req, res) => {
+    let namaContact = req.params.nama.toLowerCase().replace('-', ' ')
+    if (!findContact(namaContact)) {
+        res.status(404)
+        res.send('<h1>404 Not Found</h1>')
+    } else {
+        removeContact(namaContact)
+        req.flash('msg', 'Berhasil menghapus kontak!')
+        res.redirect('/contact')
     }
-    req.flash('msg', 'Data berhasil ditambahkan!')
-    addContact(contact)
-    res.redirect('/contact')
+})
+
+app.get('/contact/edit/:nama', (req, res) => {
+    let namaContact = req.params.nama.toLowerCase().replace('-', ' ')
+    const contact = findContact(namaContact)
+    contact.nohp = contact.nohp.replace(/^\+62/, "0")
+    const data = {
+        layout: "layouts/main",
+        title: "Edit Contact",
+        contact
+    }
+    res.render('edit-contact', data)
+})
+
+app.post('/contact/update', [
+    body('nama').custom(async (value, { req }) => {
+        if (req.body.oldNama !== req.body.nama && cekDuplikat(value)) {
+            throw new Error('Nama kontak sudah ada!')
+        }
+    }),
+    check('email', 'Email tidak valid').isEmail(),
+    check('nohp', 'Nomor HP tidak valid').isMobilePhone('id-ID')
+], (req, res) => {
+    const result = validationResult(req)
+    if (!result.isEmpty()) {
+        res.render('edit-contact', {
+            layout: "layouts/main",
+            title: "Add Contact",
+            errors: result.array(),
+            contact: req.body
+        })
+    } else {
+        req.body.nohp = req.body.nohp.replace(/^0/, "+62")
+        updateContacts(req.body)
+        req.flash('msg', 'Data berhasil diubah!')
+        res.redirect('/contact')
+    }
 })
 
 app.get('/contact/:nama', (req, res, next) => {
@@ -99,6 +145,10 @@ app.get('/contact/:nama', (req, res, next) => {
         contact
     }
     res.render('detail', data)
+})
+
+app.delete('/contact/:nama', (req, res) => {
+
 })
 
 app.use((req, res) => {

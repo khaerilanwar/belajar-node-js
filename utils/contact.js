@@ -28,7 +28,6 @@ const removeContact = (nama) => {
     const contactsJson = loadContacts()
     const newContacts = contactsJson.filter((contact) => contact.nama.toLowerCase() !== nama.toLowerCase())
     saveContacts(newContacts)
-    console.log(`Berhasil hapus kontak ${nama}`)
 }
 
 const addContact = (contact) => {
@@ -37,4 +36,12 @@ const addContact = (contact) => {
     saveContacts(contacts)
 }
 
-module.exports = { loadContacts, findContact, cekDuplikat, addContact }
+const updateContacts = (contactUpdate) => {
+    const contacts = loadContacts()
+    const newContacts = contacts.filter((contact) => contact.nama.toLowerCase() !== contactUpdate.oldNama.toLowerCase())
+    delete contactUpdate.oldNama
+    newContacts.push(contactUpdate)
+    saveContacts(newContacts)
+}
+
+module.exports = { loadContacts, findContact, cekDuplikat, addContact, removeContact, updateContacts }

@@ -11,6 +11,10 @@
                 <p class="card-text">
                     <%= contact.email %>
                 </p>
+                <a href="/contact/edit/<%= contact.nama.replace(' ', '-').toLowerCase() %>"
+                    class="badge btn btn-info mb-3">edit</a>
+                <a href="/contact/delete/<%= contact.nama.replace(' ', '-').toLowerCase() %>"
+                    class="badge btn btn-danger mb-3">hapus</a> <br>
                 <a href="/contact" class="btn btn-primary">&laquo; Kembali ke daftar kontak</a>
             </div>
         </div>
