@@ -19,6 +19,7 @@
     "express-flash": "^0.0.2",
     "express-session": "^1.18.0",
     "express-validator": "^7.0.1",
+    "mongodb": "^6.5.0",
     "nodemon": "^3.1.0",
     "validator": "^13.11.0",
     "yargs": "^17.7.2"
